@@ -14,7 +14,6 @@ This is a lightweight STM32 library for communicating with the Bosch BMP180 temp
 - STM32F103C8T6 ("Blue Pill")
 - BMP180 sensor module
 - I2C1 (100kHz)
-- STM32 HAL drivers
 
 ## 📂 Project Structure
 
