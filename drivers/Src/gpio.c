@@ -6,8 +6,9 @@
  */
 
 
-#include "stm32f103xx.h"
 #include "gpio.h"
+
+#include "stm32f103xx.h"
 
 void GPIO_ClockControl(GPIO_RegDef_t *pGPIOX, uint8_t condition){
 	if(condition==ENABLE){

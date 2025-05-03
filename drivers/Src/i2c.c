@@ -7,16 +7,17 @@
 
 
 #include <stdint.h>
+
 #include "stm32f103xx.h"
 #include "i2c.h"
 #include "gpio.h"
 #include "nvic.h"
 
-volatile uint32_t sbEvent = 0;
-volatile uint32_t addrEvent = 0;
-volatile uint32_t txeEvent = 0;
-volatile uint32_t btfEvent = 0;
-
+/**
+ * @brief      Config gpio pin for i2c use
+ * @param[in]  none
+ * @return     none
+ */
 static void __I2C_ConfigPin(){
 	GPIO_Handle_t scl;
 	GPIO_Handle_t sda;
@@ -31,6 +32,11 @@ static void __I2C_ConfigPin(){
 	GPIO_Init(&sda);
 }
 
+/**
+ * @brief      Manage i2c clock
+ * @param[in]  I2C pheripheral address
+ * @return     none
+ */
 void I2C_ClockControl(I2C_RegDef_t* pI2Cx, uint8_t condition){
 	if(condition == ENABLE){
 		if(pI2Cx == I2C1){
@@ -47,6 +53,12 @@ void I2C_ClockControl(I2C_RegDef_t* pI2Cx, uint8_t condition){
 	}
 }
 
+
+/**
+ * @brief      Initialize I2C for use
+ * @param[in]  pI2CHandle struct
+ * @return     none
+ */
 void I2C_Init(I2C_Handle_t* pI2CHandle){
 	__I2C_ConfigPin();
 	//Reset i2c before start
@@ -127,24 +139,13 @@ void I2C_Init(I2C_Handle_t* pI2CHandle){
 		pI2CHandle->pI2Cx->TRISE |= ((((8000000/100000)*300)+1)<<TRISE_POS);
 	}
 
-
-//	pI2CHandle->pI2Cx->OAR1 |= ((pI2CHandle->pI2CConfig.I2C_DeviceAddress<<1)<<OAR1_ADD);
-//	pI2CHandle->pI2Cx->OAR1 |= (1<<14); // bit 14 always set by software (datasheet)
-
 }
 
-void I2C_MasterSendData(I2C_Handle_t* pI2CHandle,uint8_t* pBuffer, uint32_t len, uint8_t slaveAddress){
-	while(len>0){
-		pI2CHandle->pI2Cx->DR = *pBuffer;
-		pBuffer++;
-		len--;
-	}
-}
-
-uint8_t I2C_CheckStatus(I2C_Handle_t* pI2CHandle){
-	return pI2CHandle->pI2CConfig.I2C_RxTxState;
-}
-
+/**
+ * @brief      Master mode start send data with interupt
+ * @param[in]  pI2CHandle struct, address of variable send data, length data, slave address
+ * @return     none
+ */
 void I2C_MasterSendIT(I2C_Handle_t* pI2CHandle, uint16_t* data, uint8_t len, uint8_t address){
 	uint8_t state = pI2CHandle->pI2CConfig.I2C_RxTxState;
 
@@ -162,11 +163,14 @@ void I2C_MasterSendIT(I2C_Handle_t* pI2CHandle, uint16_t* data, uint8_t len, uin
 		pI2CHandle->pI2Cx->CR2 |= (1<<CR2_ITEVTEN);
 		pI2CHandle->pI2Cx->CR2 |= (1<<CR2_ITBUFEN);
 
-
-
 	}
 }
 
+/**
+ * @brief      Master mode start recive data with interupt
+ * @param[in]  pI2CHandle struct, address of variable recive data, number of byte recive data, slave address
+ * @return     none
+ */
 void I2C_MasterReciveIT(I2C_Handle_t* pI2CHandle, uint16_t* reciveData, uint8_t byteRecive, uint8_t address){
 	uint8_t state = pI2CHandle->pI2CConfig.I2C_RxTxState;
 
@@ -190,26 +194,52 @@ void I2C_MasterReciveIT(I2C_Handle_t* pI2CHandle, uint16_t* reciveData, uint8_t 
 	}
 }
 
+/**
+ * @brief      Generate start condition turn on bit 8 of CCR1 Reg
+ * @param[in]  I2C pheripheral address
+ * @return     none
+ */
 void I2C_GenerateStartCondition(I2C_RegDef_t* pI2Cx){
 
 	pI2Cx->CR1 |= (1<<CCR1_START);
 }
 
+/**
+ * @brief      Generate stop condition turn on bit 9 of CCR1 Reg
+ * @param[in]  I2C pheripheral address
+ * @return     none
+ */
 void I2C_GenerateStopCondition(I2C_RegDef_t* pI2Cx){
 	pI2Cx->CR1 |= (1<<CCR1_STOP);
 }
 
+/**
+ * @brief      Generate address phase with write permision, get slave address add bit 0 and assign to DR reg
+ * @param[in]  I2C pheripheral address, slave address (7 bit)
+ * @return     none
+ */
 static void I2C_AddressPhaseWrite(I2C_RegDef_t* pI2Cx, uint8_t slaveAddress){
 	slaveAddress = slaveAddress << 1;
 	slaveAddress &= ~(1);
 	pI2Cx->DR = slaveAddress;
 }
 
+/**
+ * @brief      Generate address phase with read permision, get slave address add bit 1 and assign to DR reg
+ * @param[in]  I2C pheripheral address, slave address (7 bit)
+ * @return     none
+ */
 static void I2C_AddressPhaseRead(I2C_RegDef_t* pI2Cx, uint8_t slaveAddress){
 	slaveAddress = slaveAddress << 1;
 	slaveAddress |= 1;
 	pI2Cx->DR = slaveAddress;
 }
+
+/**
+ * @brief      Get flag status of a i2c reg
+ * @param[in]  I2C reg, flag need to check
+ * @return     FLAG_RESET, FLAG_SET
+ */
 
 uint8_t I2C_GetFlagStatus(uint32_t reg, uint8_t flag){
 	if(reg & flag){
@@ -219,6 +249,11 @@ uint8_t I2C_GetFlagStatus(uint32_t reg, uint8_t flag){
 	}
 }
 
+/**
+ * @brief      Handling interupt
+ * @param[in]  pI2CHandle struct
+ * @return     none
+ */
 void I2C_InteruptHandling( I2C_Handle_t* pI2CHandle){
 	uint32_t sr1 = pI2CHandle->pI2Cx->SR1;
 
@@ -299,6 +334,11 @@ void I2C_InteruptHandling( I2C_Handle_t* pI2CHandle){
 
 }
 
+/**
+ * @brief      Manage ACK, turn on or off ACK
+ * @param[in]  I2C pheripheral address, ENABLE or DISABLE conditon
+ * @return     none
+ */
 void I2C_ACKManage(I2C_RegDef_t* pI2Cx, uint8_t condition){
 	if(condition==ENABLE){
 		pI2Cx->CR1 |= (1 << CR1_ACK);
@@ -308,12 +348,22 @@ void I2C_ACKManage(I2C_RegDef_t* pI2Cx, uint8_t condition){
 
 }
 
+/**
+ * @brief      Clear address flag after address phase
+ * @param[in]  I2C pheripheral address
+ * @return     none
+ */
 static void I2C_ClearAddrFlag(I2C_RegDef_t* pI2Cx){
 	uint32_t dummyRead = pI2Cx->SR1;
 	dummyRead = pI2Cx->SR2;
 //	(void)dummyRead;
 }
 
+/**
+ * @brief      Master mode recive data with polling
+ * @param[in]  pI2CHandle struct, address of recive varialble data, number of byte recive, slave address
+ * @return     none
+ */
 void I2C_MasterRecivePolling(I2C_Handle_t* pI2CHandle, uint16_t* reciveData, uint8_t byteRecive, uint8_t address){
 
 	if(byteRecive>2){
@@ -359,6 +409,11 @@ void I2C_MasterRecivePolling(I2C_Handle_t* pI2CHandle, uint16_t* reciveData, uin
 	}
 }
 
+/**
+ * @brief      Master mode send data with polling
+ * @param[in]  pI2CHandle struct, address of send varialble data, number of byte send, slave address
+ * @return     none
+ */
 void I2C_MasterSendPolling(I2C_Handle_t* pI2CHandle, uint16_t* sendData, uint8_t byteSend, uint8_t address){
 	uint8_t byteSend2 = byteSend+1;
 	I2C_GenerateStartCondition(pI2CHandle->pI2Cx);

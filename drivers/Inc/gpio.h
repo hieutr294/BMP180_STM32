@@ -9,8 +9,9 @@
 #define INC_GPIO_H_
 
 
-#include "stm32f103xx.h"
 #include <stdint.h>
+
+#include "stm32f103xx.h"
 
 #define ANALOG_INPUT 0
 #define FLOATING_INPUT 1

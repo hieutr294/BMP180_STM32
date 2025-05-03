@@ -10,6 +10,7 @@
 
 
 #include <stdint.h>
+
 #include "stm32f103xx.h"
 
 #define I2C_SCL_SPEED_SM			100000 // Standard mode
@@ -57,15 +58,7 @@
 
 typedef struct{
 	uint32_t I2C_SCLSpeed;
-	uint8_t I2C_DeviceAddress;
-	uint8_t I2C_ACKControl;
 	uint8_t I2C_FMDutyCycle;
-	uint16_t* I2C_SendData;
-	uint16_t* I2C_ReciveData;
-	uint8_t I2C_ByteRecive;
-	uint8_t I2C_Index;
-	uint8_t I2C_SlaveAddress;
-	uint8_t I2C_DataLength;
 	uint8_t I2C_RxTxState;
 	void (*I2C_CallBack)(uint8_t state);
 }I2C_Config_t;
@@ -99,7 +92,6 @@ void I2C_InteruptHandling(I2C_Handle_t* pI2CHandle);
 static void I2C_AddressPhaseRead(I2C_RegDef_t* pI2Cx, uint8_t slaveAddress);
 static void I2C_AddressPhaseWrite(I2C_RegDef_t* pI2Cx, uint8_t slaveAddress);
 static void I2C_ClearAddrFlag(I2C_RegDef_t* pI2Cx);
-//static void I2C_AddressPhase(I2C_RegDef_t* pI2Cx, uint8_t slaveAddress);
 uint8_t I2C_GetFlagStatus(uint32_t reg, uint8_t flag);
 
 #endif /* INC_I2C_H_ */

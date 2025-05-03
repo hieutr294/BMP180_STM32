@@ -6,7 +6,7 @@
  */
 
 
-#include "stm32f103xx.h"
+#include "../../drivers/Inc/stm32f103xx.h"
 
 void delay_us(uint32_t us) {
     for (uint32_t i = 0; i < us * 8; i++) {
