@@ -11,7 +11,24 @@
 #include "stdint.h"
 #include "i2c.h"
 
-void bmp180GetCalibData(I2C_Handle_t* i2c, uint16_t* calibData);
+typedef union{
+	uint16_t full[11];
+	struct{
+		uint16_t AC1;
+		uint16_t AC2;
+		uint16_t AC3;
+		uint16_t AC4;
+		uint16_t AC5;
+		uint16_t AC6;
+		uint16_t B1;
+		uint16_t B2;
+		uint16_t MB;
+		uint16_t MC;
+		uint16_t MD;
+	}get;
+}BMP180_CALIBDATA;
+
+void bmp180GetCalibData(I2C_Handle_t* i2c, BMP180_CALIBDATA* calibData);
 
 
 #endif /* DRIVERS_INC_BMP180_H_ */

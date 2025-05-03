@@ -27,12 +27,10 @@
 #endif
 
 I2C_Handle_t i2c;
-uint16_t calibData[11];
+BMP180_CALIBDATA calibData;
 
 int main(void)
 {
-
-
 
 	i2c.pI2Cx = I2C1;
 	i2c.pI2CConfig.I2C_SCLSpeed = I2C_SCL_SPEED_SM; //I2C Standard mode
@@ -41,7 +39,7 @@ int main(void)
 	I2C_ClockControl(i2c.pI2Cx, ENABLE); // Enable i2c clock
 	I2C_Init(&i2c); // initialze i2c from config
 
-	bmp180GetCalibData(&i2c, calibData);
+	bmp180GetCalibData(&i2c, &calibData);
 
 	while(1){
 
