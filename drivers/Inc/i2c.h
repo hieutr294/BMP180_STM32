@@ -60,6 +60,11 @@ typedef struct{
 	uint32_t I2C_SCLSpeed;
 	uint8_t I2C_FMDutyCycle;
 	uint8_t I2C_RxTxState;
+	uint32_t *I2C_SendData;
+	uint32_t *I2C_ReciveData;
+	uint32_t I2C_ByteRecive;
+	uint8_t I2C_DataLength;
+	uint8_t I2C_SlaveAddress;
 	void (*I2C_CallBack)(uint8_t state);
 }I2C_Config_t;
 
@@ -80,9 +85,9 @@ static void __I2C_ConfigPin();
 void I2C_ClockControl(I2C_RegDef_t* pI2Cx, uint8_t condition);
 void I2C_Init(I2C_Handle_t* pI2CHandle);
 void I2C_MasterSendData(I2C_Handle_t* pI2CHandle,uint8_t* pBuffer, uint32_t len, uint8_t slaveAddress);
-void I2C_MasterSendIT(I2C_Handle_t* pI2CHandle, uint16_t* data, uint8_t len, uint8_t address);
+void I2C_MasterSendIT(I2C_Handle_t* pI2CHandle, uint32_t* data, uint8_t len, uint8_t address);
 void I2C_MasterSendPolling(I2C_Handle_t* pI2CHandle, uint16_t* data, uint8_t len, uint8_t address);
-void I2C_MasterReciveIT(I2C_Handle_t* pI2CHandle, uint16_t* reciveData, uint8_t byteRecive, uint8_t address);
+void I2C_MasterReciveIT(I2C_Handle_t* pI2CHandle, uint32_t* reciveData, uint8_t byteRecive, uint8_t address);
 void I2C_MasterRecivePolling(I2C_Handle_t* pI2CHandle, uint16_t* reciveData, uint8_t byteRecive, uint8_t address);
 uint8_t I2C_CheckStatus(I2C_Handle_t* pI2CHandle);
 void I2C_ACKManage(I2C_RegDef_t* pI2Cx, uint8_t condition);

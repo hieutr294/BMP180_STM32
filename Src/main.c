@@ -18,6 +18,7 @@
 
 #include <stdint.h>
 
+#include "bmp180.h"
 #include "stm32f103xx.h"
 #include "i2c.h"
 
@@ -25,10 +26,23 @@
   #warning "FPU is not initialized, but the project is compiling for an FPU. Please initialize the FPU before use."
 #endif
 
-
+I2C_Handle_t i2c;
+uint16_t calibData[11];
 
 int main(void)
 {
+
+
+
+	i2c.pI2Cx = I2C1;
+	i2c.pI2CConfig.I2C_SCLSpeed = I2C_SCL_SPEED_SM; //I2C Standard mode
+	i2c.pI2CConfig.I2C_FMDutyCycle = I2C_FM_DUTY_2;
+
+	I2C_ClockControl(i2c.pI2Cx, ENABLE); // Enable i2c clock
+	I2C_Init(&i2c); // initialze i2c from config
+
+	bmp180GetCalibData(&i2c, calibData);
+
 	while(1){
 
 	}

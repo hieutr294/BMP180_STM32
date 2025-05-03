@@ -67,11 +67,11 @@ void I2C_Init(I2C_Handle_t* pI2CHandle){
 
 	pI2CHandle->pI2Cx->CR1 |= (1<<CR1_PE);
 
-	if(pI2CHandle->pI2CConfig.I2C_ACKControl==I2C_ACK_ENABLE){
-		pI2CHandle->pI2Cx->CR1 |= (1<<CR1_ACK);
-	}else if(pI2CHandle->pI2CConfig.I2C_ACKControl==I2C_ACK_DISABLE){
-		pI2CHandle->pI2Cx->CR1 &= ~(1<<CR1_ACK);
-	}
+//	if(pI2CHandle->pI2CConfig.I2C_ACKControl==I2C_ACK_ENABLE){
+//		pI2CHandle->pI2Cx->CR1 |= (1<<CR1_ACK);
+//	}else if(pI2CHandle->pI2CConfig.I2C_ACKControl==I2C_ACK_DISABLE){
+//		pI2CHandle->pI2Cx->CR1 &= ~(1<<CR1_ACK);
+//	}
 
 	if(pI2CHandle->pI2CConfig.I2C_SCLSpeed == I2C_SCL_SPEED_SM){
 
@@ -146,7 +146,7 @@ void I2C_Init(I2C_Handle_t* pI2CHandle){
  * @param[in]  pI2CHandle struct, address of variable send data, length data, slave address
  * @return     none
  */
-void I2C_MasterSendIT(I2C_Handle_t* pI2CHandle, uint16_t* data, uint8_t len, uint8_t address){
+void I2C_MasterSendIT(I2C_Handle_t* pI2CHandle, uint32_t* data, uint8_t len, uint8_t address){
 	uint8_t state = pI2CHandle->pI2CConfig.I2C_RxTxState;
 
 	if(state!=I2C_BUSY_TX && state!=I2C_BUSY_RX){
@@ -171,14 +171,13 @@ void I2C_MasterSendIT(I2C_Handle_t* pI2CHandle, uint16_t* data, uint8_t len, uin
  * @param[in]  pI2CHandle struct, address of variable recive data, number of byte recive data, slave address
  * @return     none
  */
-void I2C_MasterReciveIT(I2C_Handle_t* pI2CHandle, uint16_t* reciveData, uint8_t byteRecive, uint8_t address){
+void I2C_MasterReciveIT(I2C_Handle_t* pI2CHandle, uint32_t* reciveData, uint8_t byteRecive, uint8_t address){
 	uint8_t state = pI2CHandle->pI2CConfig.I2C_RxTxState;
 
 	if(state!=I2C_BUSY_TX && state!=I2C_BUSY_RX){
 		pI2CHandle->pI2CConfig.I2C_ReciveData = reciveData;
 		pI2CHandle->pI2CConfig.I2C_SlaveAddress = address;
 		pI2CHandle->pI2CConfig.I2C_ByteRecive = byteRecive;
-		pI2CHandle->pI2CConfig.I2C_Index = 0;
 		pI2CHandle->pI2CConfig.I2C_RxTxState = I2C_BUSY_RX;
 
 		nvicEnable(I2C1_EV_IRQ_NUMBER);
