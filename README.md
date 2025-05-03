@@ -8,8 +8,6 @@ This is a lightweight STM32 library for communicating with the Bosch BMP180 temp
 - Read pressure (in Pa)
 - Calculate altitude (optional)
 - Based on Bosch BMP180 datasheet
-- Written in C, compatible with STM32 HAL
-- Easy integration into STM32CubeIDE projects
 
 ## ✅ Tested On
 
