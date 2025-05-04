@@ -21,6 +21,8 @@
 #include "bmp180.h"
 #include "stm32f103xx.h"
 #include "i2c.h"
+#include "gpio.h"
+#include "systemtick.h"
 
 #if !defined(__SOFT_FP__) && defined(__ARM_FP)
   #warning "FPU is not initialized, but the project is compiling for an FPU. Please initialize the FPU before use."
@@ -28,20 +30,41 @@
 
 I2C_Handle_t i2c;
 BMP180_CALIBDATA calibData;
+GPIO_Handle_t gpio;
+uint32_t a = 0;
+
+
 
 int main(void)
 {
+	SysTick_Handle_t sysTick;
+	gpio.pGPIOX = GPIOA;
+	gpio.GPIO_PinConfig.pinNumber = PIN_10;
+	gpio.GPIO_PinConfig.pinMode = GPIO_MODE_PUSH_PULL_50MHZ;
 
-	i2c.pI2Cx = I2C1;
-	i2c.pI2CConfig.I2C_SCLSpeed = I2C_SCL_SPEED_SM; //I2C Standard mode
-	i2c.pI2CConfig.I2C_FMDutyCycle = I2C_FM_DUTY_2;
+	sysTick.pSTK = STK;
+	sysTick.systemTickConfig.INTEN = DISABLE;
+	sysTick.systemTickConfig.clockSource = (uint8_t)STK_CTRL_CLKSOURCE_AHBDIV8;
+	sysTick.systemTickConfig.delayTime = 5;
 
-	I2C_ClockControl(i2c.pI2Cx, ENABLE); // Enable i2c clock
-	I2C_Init(&i2c); // initialze i2c from config
-
-	bmp180GetCalibData(&i2c, &calibData);
+	GPIO_ClockControl(gpio.pGPIOX, ENABLE);
+	GPIO_Init(&gpio);
+	SystemTick_Start(&sysTick);
+//	i2c.pI2Cx = I2C1;
+//	i2c.pI2CConfig.I2C_SCLSpeed = I2C_SCL_SPEED_SM; //I2C Standard mode
+//	i2c.pI2CConfig.I2C_FMDutyCycle = I2C_FM_DUTY_2;
+//
+//	I2C_ClockControl(i2c.pI2Cx, ENABLE); // Enable i2c clock
+//	I2C_Init(&i2c); // initialze i2c from config
+//
+//	bmp180GetCalibData(&i2c, &calibData);
 
 	while(1){
-
+		while(getCountFlag(&sysTick)){
+			a+=1;
+		}
+//		GPIO_TogglePin(gpio.pGPIOX, gpio.GPIO_PinConfig.pinNumber);
+//		a+=1;
+//		delay_us(2000000);
 	}
 }
