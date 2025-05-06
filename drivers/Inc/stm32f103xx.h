@@ -444,8 +444,4 @@ typedef struct{
 /*-------------------------- IQRNUMBER ---------------------------------*/
 #define SPI1_GLOBAL_INTERRUPT 	32
 
-void delay_us(uint32_t us);
-
-void delay_ms(uint32_t ms);
-
 #endif /* INC_STM32F103XX_H_ */

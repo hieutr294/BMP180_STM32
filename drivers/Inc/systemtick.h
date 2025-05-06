@@ -20,13 +20,14 @@
 #define STK_CTRL_CLKSOURCE_AHBDIV8 ~(1<<2)
 #define STK_CTRL_CLKSOURCE_AHB (1<<2)
 
+#define STK_COUNTFLAG (1<<16)
 /*
- * Config system tick clock source with STK_CTRL_CLKSOURCE_AHBDIV8 or STK_CTRL_CLKSOURCE_AHB flag
+ * - Config system tick clock source with STK_CTRL_CLKSOURCE_AHBDIV8 or STK_CTRL_CLKSOURCE_AHB flag
  * If using with STK_CTRL_CLKSOURCE_AHBDIV8 flag mean AHB bus divide by 8
  * Then AHBBUS/8 equal to 8Mhz(HSI clock) / 8 = 1Mhz
  * Mean 1 Cycle = 1us
- * Config INTEN = STK_CTRL_TICK_INT_ASSERT or STK_CTRL_TICK_INT_NOTASSERT to active or inactive interupt (SysTick_Handler)
- * Config clockSource with STK_CTRL_CLKSOURCE_AHBDIV8 (AHB divide by 8) or STK_CTRL_CLKSOURCE_AHB (AHB divide by 1)
+ * - Config INTEN = STK_CTRL_TICK_INT_ASSERT or STK_CTRL_TICK_INT_NOTASSERT to active or inactive interupt (SysTick_Handler)
+ * - Config clockSource with STK_CTRL_CLKSOURCE_AHBDIV8 (AHB divide by 8) or STK_CTRL_CLKSOURCE_AHB (AHB divide by 1)
  * Assign load value to system tick load register through delayTime variable of SysTick_Config_t struct
  * If choose clockSource with STK_CTRL_CLKSOURCE_AHBDIV8 (AHB divide by 8) mean 1 cycle = 1us => 1s = 1000000 us
  * Need to assign 1000000 to delayTime variable of SysTick_Config_t struct
@@ -35,7 +36,6 @@
  * */
 
 typedef struct{
-	uint32_t delayTime;
 	uint8_t clockSource;
 	uint8_t INTEN;
 }SysTick_Config_t;
@@ -44,4 +44,9 @@ typedef struct{
 	SysTick_RegDef_t* pSTK;
 	SysTick_Config_t systemTickConfig;
 }SysTick_Handle_t;
+
+void SystemTickInit();
+uint32_t getCurrentValue();
+void delay_us(uint16_t delayTime);
+void delay_ms(uint16_t delayTime);
 #endif /* INC_SYSTEMTICK_H_ */
