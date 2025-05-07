@@ -29,7 +29,7 @@
 #endif
 
 I2C_Handle_t i2c;
-BMP180_CALIBDATA calibData;
+
 
 uint32_t rawTemperatureData = 0;
 double temperatureData = 0;
@@ -46,10 +46,10 @@ int main(void)
 	I2C_ClockControl(i2c.pI2Cx, ENABLE); // Enable i2c clock
 	I2C_Init(&i2c); // initialze i2c from config
 
-	bmp180GetCalibData(&i2c, &calibData);
+	bmp180GetCalibData(&i2c);
 
 	while(1){
 		rawTemperatureData = bmp180GetRawTemperature(&i2c);
-		temperatureData = bmp180GetTemperature(&i2c, &calibData);
+		temperatureData = bmp180GetTemperature(&i2c);
 	}
 }

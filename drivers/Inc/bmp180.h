@@ -28,8 +28,8 @@ typedef union{
 	}get;
 }BMP180_CALIBDATA;
 
-void bmp180GetCalibData(I2C_Handle_t* i2c, BMP180_CALIBDATA* calibData);
+void bmp180GetCalibData(I2C_Handle_t* i2c);
 uint32_t bmp180GetRawTemperature(I2C_Handle_t* i2c);
-double  bmp180GetTemperature(I2C_Handle_t* i2c, BMP180_CALIBDATA* calibData);
+double  bmp180GetTemperature(I2C_Handle_t* i2c);
 
 #endif /* DRIVERS_INC_BMP180_H_ */
