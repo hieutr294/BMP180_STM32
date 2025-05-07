@@ -8,6 +8,7 @@
 #include "stdint.h"
 #include "i2c.h"
 #include "systemtick.h"
+#include "math.h"
 
 void bmp180GetCalibData(I2C_Handle_t* i2c, BMP180_CALIBDATA* calibData){
 
@@ -25,17 +26,19 @@ void bmp180GetCalibData(I2C_Handle_t* i2c, BMP180_CALIBDATA* calibData){
 uint32_t bmp180GetRawTemperature(I2C_Handle_t* i2c){
 	uint16_t rawTemperature[2];
 	uint16_t temperatureControllReg[2] = {0xf4,0x2e};
+	uint16_t rawTemperatureDataReg[1] = {0xf6};
 	I2C_MasterSendPolling(i2c, temperatureControllReg, 2, 0x77);
 	delay_ms(4);
+	I2C_MasterSendPolling(i2c, rawTemperatureDataReg, 1, 0x77);
 	I2C_MasterRecivePolling(i2c, rawTemperature, 2, 0x77);
 	return rawTemperature[0]<<8 | rawTemperature[1];
 }
 
-float bmp180GetTemperature(I2C_Handle_t* i2c, BMP180_CALIBDATA* calibData){
-	float X1 = ((2560 - calibData->get.AC6) * calibData->get.AC5)>>15;
-	float X2 = ((calibData->get.MC)<<11)/(X1+calibData->get.MD);
-	float B5 = X1+X2;
-//	float T = (B5+8)>>4;
-	return X1;
+double bmp180GetTemperature(I2C_Handle_t* i2c, BMP180_CALIBDATA* calibData){
+	double X1 = (((int)(bmp180GetRawTemperature(i2c) - calibData->get.AC6))*calibData->get.AC5)/(long)(1<<15);
+	double X2 = round(((calibData->get.MC)*(1<<11))/(X1+calibData->get.MD));
+	double B5 = X1+X2;
+	double T = (B5+8)/(1<<4);
+	return round(T);
 }
 

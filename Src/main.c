@@ -30,21 +30,15 @@
 
 I2C_Handle_t i2c;
 BMP180_CALIBDATA calibData;
-GPIO_Handle_t gpio;
-uint32_t a = 0;
-float b = 0;
+
+uint32_t rawTemperatureData = 0;
+double temperatureData = 0;
 
 
 int main(void)
 {
 
-	gpio.pGPIOX = GPIOA;
-	gpio.GPIO_PinConfig.pinNumber = PIN_10;
-	gpio.GPIO_PinConfig.pinMode = GPIO_MODE_PUSH_PULL_50MHZ;
-
-	GPIO_ClockControl(gpio.pGPIOX, ENABLE);
-	GPIO_Init(&gpio);
-	SystemTickInit();
+	SystemTickInit(); // Initialize for using delay
 	i2c.pI2Cx = I2C1;
 	i2c.pI2CConfig.I2C_SCLSpeed = I2C_SCL_SPEED_SM; //I2C Standard mode
 	i2c.pI2CConfig.I2C_FMDutyCycle = I2C_FM_DUTY_2;
@@ -55,9 +49,7 @@ int main(void)
 	bmp180GetCalibData(&i2c, &calibData);
 
 	while(1){
-		a = bmp180GetRawTemperature(&i2c);
-		b = bmp180GetTemperature(&i2c, &calibData);
-//		a+=1;
-//		delay_us(2000000);
+		rawTemperatureData = bmp180GetRawTemperature(&i2c);
+		temperatureData = bmp180GetTemperature(&i2c, &calibData);
 	}
 }
